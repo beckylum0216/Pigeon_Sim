@@ -24,7 +24,37 @@ namespace Assignment1_Pigeon_Sim
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
         }
+
+        public void SetPosition(Vector3 inputPosition)
+        {
+            this.actorPosition = inputPosition;
+        }
+
+        public Vector3 GetPosition()
+        {
+            return this.actorPosition;
+        }
+
+        public void SetRotation(Vector3 inputRotation)
+        {
+            this.actorRotation = inputRotation;
+        }
         
+        public Vector3 GetRotation()
+        {
+            return this.actorRotation;
+        }
+
+        public void SetScale(float inputScale)
+        {
+            this.actorScale = inputScale;
+        }
+
+        public float GetScale()
+        {
+            return this.actorScale;
+        }
+
         public override void ActorDraw(Matrix world, Matrix view, Matrix projection)
         {
             foreach (ModelMesh mesh in actorModel.Meshes)

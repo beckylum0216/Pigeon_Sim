@@ -10,16 +10,38 @@ namespace Assignment1_Pigeon_Sim
 {
     class Camera
     {
-        private Vector3 pitchVector = new Vector3(1, 0, 0);
-        private Vector3 yawVector = new Vector3(0, 1, 0);
-        private Vector3 rollVector = new Vector3(0, 0, 1);
+        Matrix theCamera;
+        private Vector3 cameraPosition;
+        private Vector3 cameraEye;
+        private Vector3 cameraDelta;
+
+        private Vector3 axisVector = new Vector3(1, 0, 0);
+        
+        
         private Quaternion deltaQuaternion;
         
-        public Camera(Vector3 deltaVector)
+        public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector)
         {
-            deltaQuaternion = new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0);
-            deltaQuaternion.Normalize();
-            Debug.WriteLine("deltaQuat : " + deltaQuaternion.X + " " + deltaQuaternion.Y + " " + deltaQuaternion.Z + " " + deltaQuaternion.W);
+            this.theCamera = inputCamera;
+            this.cameraPosition = initPosition;
+            this.cameraEye = eyePosition;
+            this.cameraDelta = deltaVector;
+            this.deltaQuaternion = Quaternion.Identity;
+        }
+        
+        public void SetCameraPosition(Vector3 inputVector)
+        {
+            this.cameraPosition = inputVector;
+        }
+
+        public Vector3 GetCameraPosition()
+        {
+            return this.cameraPosition;
+        }
+
+        public void SetCameraEye(Vector3 inputVector)
+        {
+            this.cameraEye = inputVector;
         }
 
         public Vector3 GetDeltaVector()
@@ -29,69 +51,42 @@ namespace Assignment1_Pigeon_Sim
             return deltaVector;
         }
 
-        public Vector3 CameraUpdate(Vector3 positionVector, Vector3 inputVector)
+        public Vector3 CameraUpdate(Vector3 deltaVector, Vector3 targetAxis, float inputDegrees, Vector3 inputVector)
         {
-            Vector3 resultVector;
-            Vector2 testVector = new Vector2(inputVector.X, inputVector.Y);
-            
+
             if (inputVector.Length() > 0)
             {
-                float radianX = CameraRadian(inputVector.X);
-                float radianY = CameraRadian(inputVector.Y);
-                float radianZ = CameraRadian(inputVector.Z);
-
-                Vector3 deltaVector = new Vector3(deltaQuaternion.X, deltaQuaternion.Y, deltaQuaternion.Z);
-
-                pitchVector = Vector3.Cross(deltaVector, yawVector);
-
-                rollVector = deltaVector;
+                float radianInput = CameraRadian(inputDegrees);
                
-                pitchVector.Normalize();
-                yawVector.Normalize();
-                rollVector.Normalize();
+                deltaQuaternion = new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0);
+
+                Quaternion resultQuaternion = RotateCamera(radianInput, targetAxis, deltaQuaternion);
                 
-                Quaternion pitchQuaternion = RotateCamera(radianY, pitchVector, deltaQuaternion);
-                Debug.WriteLine("pitch Quat: " + pitchQuaternion.X + " " + pitchQuaternion.Y + " " + pitchQuaternion.Z + " " + pitchQuaternion.W);
+                cameraDelta = new Vector3(resultQuaternion.X, resultQuaternion.Y, resultQuaternion.Z);
+                Debug.WriteLine("front Axis: " + cameraDelta.X + " " + cameraDelta.Y + " " + cameraDelta.Z);
 
-                Quaternion yawQuaternion = RotateCamera(-radianX, yawVector, deltaQuaternion);
-                Debug.WriteLine("yaw quat: " + yawVector.X + " " + yawVector.Y + " " + yawVector.Z);
+                radianInput = 0;
 
-                Quaternion rollQuaternion = RotateCamera(radianZ, rollVector, deltaQuaternion);
-                Debug.WriteLine("roll quat: " + rollVector.X + " " + rollVector.Y + " " + rollVector.Z);
-
-                pitchQuaternion.Normalize();
-                yawQuaternion.Normalize();
-                rollQuaternion.Normalize();
-
-                // this is suspect
-                Quaternion rotateQuaternion = Quaternion.Multiply(Quaternion.Multiply( pitchQuaternion, yawQuaternion), rollQuaternion);
-                //Quaternion rotateQuaternion = Quaternion.Multiply(pitchQuaternion, yawQuaternion);
-                rotateQuaternion.Normalize();
-
-
-
-                Quaternion positionQuaternion = new Quaternion(positionVector.X, positionVector.Y, positionVector.Z, 0);
-                Quaternion resultQuaternion = Quaternion.Multiply(rotateQuaternion, positionQuaternion);
-                resultQuaternion.Normalize();
-
-                resultVector = new Vector3(rotateQuaternion.X, rotateQuaternion.Y, rotateQuaternion.Z);
-
-                Debug.WriteLine("result: " + resultVector.X + " " + resultVector.Y + " " + resultVector.Z);
-
-                radianX = 0;
-                radianY = 0;
-                radianZ = 0;
-                
-                return resultVector;
+                return cameraDelta;
+               
             }
             else
             {
-                resultVector = new Vector3(Quaternion.Identity.X, Quaternion.Identity.Y, Quaternion.Identity.Z);
 
-                return resultVector;
+                return deltaVector;
+               
             }
             
         }
+
+        
+
+
+        public void cameraMove()
+        {
+
+        }
+
 
         // qpq'
         private Quaternion RotateCamera(float inputAngle, Vector3 inputAxis, Quaternion pQuat)
@@ -137,9 +132,7 @@ namespace Assignment1_Pigeon_Sim
 
             return rotationQuart;
         }
-
         
-
         public float CameraRadian(float inputDegree)
         {
             return inputDegree * (float)(Math.PI / 180);

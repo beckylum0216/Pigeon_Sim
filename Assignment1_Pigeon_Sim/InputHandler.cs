@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Assignment1_Pigeon_Sim
 {
     class InputHandler
     {
         MouseState mouseInput;
-        int maxRotationRate = 1;
         Vector3 mouseDelta;
         Vector3 mousePosition;
 
@@ -30,7 +30,9 @@ namespace Assignment1_Pigeon_Sim
             float magnitude = 0.25f;
             float centerX = (float)screenX / 2;
             float centerY = (float)screenY / 2;
-            
+
+            Mouse.SetPosition((int)centerX, (int)centerY);
+
             // get mouse input
             mouseInput = Mouse.GetState();
 
@@ -38,10 +40,11 @@ namespace Assignment1_Pigeon_Sim
             Vector3 inputVector = new Vector3(mouseInput.X, mouseInput.Y, 0);
             Vector3 centerVector = new Vector3(centerX, centerY, 0);
             Vector3 positionVector = Vector3.Subtract(inputVector, centerVector);
-            Debug.WriteLine("Mouse Input: "+ inputVector.X +" "+inputVector.Y);
+            Debug.WriteLine("Mouse Input: "+ positionVector.X +" "+ positionVector.Y + " " + positionVector.Length());
 
+           
             // if magnitude of vector is greater than radius of x
-            if (inputVector.Length() < magnitude)
+            if ( positionVector.Length() < magnitude)
             {
                 mouseDelta = new Vector3(0, 0, 0);
             }
@@ -49,20 +52,25 @@ namespace Assignment1_Pigeon_Sim
             {
                 // https://books.google.com.au/books?id=RFF0AgAAQBAJ&pg=PA98&lpg=PA98&dq=deadzone+implementation+game+algorithm&source=bl&ots=fZCDZUNrPf&sig=ACfU3U3M4KSKOIelMGPKC9LFrcELk5aZTA&hl=en&sa=X&ved=2ahUKEwja_dnNkZzhAhUIeisKHaaTCzwQ6AEwAXoECAkQAQ#v=onepage&q=deadzone%20implementation%20game%20algorithm&f=false
                 // calculate distance and work out the proportion of distance to center
-                float percent = ((float)positionVector.Length() - magnitude) / (maxRotationRate - magnitude);
+                float percent = ((float)positionVector.Length() - magnitude) / (magnitude + positionVector.Length());
                 positionVector.Normalize();
-                mouseDelta = Vector3.Multiply(positionVector, maxRotationRate * percent);
-                mouseDelta.Normalize();
+
+                // restricting values between 0 and 2 degrees
+                mouseDelta = Vector3.Multiply(positionVector,  percent * 2);
+                
+                // only use when restricting between 0 and 1
+                //mouseDelta.Normalize();
                 
             }
 
             Debug.WriteLine("Mouse Vector: " + mouseDelta.X + " " + mouseDelta.Y + " " + mouseDelta.Z);
 
-            Mouse.SetPosition((int) centerX, (int)centerY);
+            Mouse.SetPosition((int)centerX, (int)centerY);
 
             return mouseDelta;
         }
 
+        
         public Vector3 KeyboardHandler()
         {
 
