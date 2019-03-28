@@ -44,6 +44,11 @@ namespace Assignment1_Pigeon_Sim
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            int screenX = Window.ClientBounds.Width;
+            int screenY = Window.ClientBounds.Height;
+
+            int centerX = (int)(screenX / 2);
+            int centerY = (int)(screenY / 2);
 
             mapClient = new PlotClient(Content, 7, 7, 0.5f);
             mapClient.SetPlotList();
@@ -58,7 +63,9 @@ namespace Assignment1_Pigeon_Sim
             deltaVector = new Vector3(0.01f, 0, 0);
             camera = new Camera(theCamera, camPositionVector, camEyeVector, deltaVector);
             //theCamera = Matrix.CreateLookAt(new Vector3(50, 0, 0), new Vector3(0, 0, 0), Vector3.Up);
-           
+
+            Mouse.SetPosition((int)centerX, (int)centerY);
+
             base.Initialize();
         }
 

@@ -31,8 +31,7 @@ namespace Assignment1_Pigeon_Sim
             float centerX = (float)screenX / 2;
             float centerY = (float)screenY / 2;
 
-            Mouse.SetPosition((int)centerX, (int)centerY);
-
+            
             // get mouse input
             mouseInput = Mouse.GetState();
 
@@ -66,7 +65,7 @@ namespace Assignment1_Pigeon_Sim
             Debug.WriteLine("Mouse Vector: " + mouseDelta.X + " " + mouseDelta.Y + " " + mouseDelta.Z);
 
             Mouse.SetPosition((int)centerX, (int)centerY);
-
+            //Mouse.SetPosition(0, 0);
             return mouseDelta;
         }
 
